@@ -1,10 +1,11 @@
 import { configApp } from '@/config/config';
 import { ICategoria, IPost } from '@/models/definitions';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-
-
+import RichTextEditor from '@/components/RichTextEditor';
 
 const PostsAdmin = () => {
+  const router = useRouter();
   const postInicio: IPost = {
       id: '',
       title: '',
@@ -70,7 +71,7 @@ const PostsAdmin = () => {
 
     setLoading(true);
     try {
-      const res = await fetch(`${process.env.API_URL}/posts/${id}`, {
+      const res = await fetch(`${configApp.api.urlBase}${configApp.routes.posts}/${id}`, {
         method: 'DELETE',
       });
 
@@ -87,12 +88,20 @@ const PostsAdmin = () => {
     }
   };
 
+  const handlerUpdatePost = async(id: string) => {
+    if (!confirm('Tem certeza que deseja editar este post?')) return;
+
+    setLoading(true);
+
+    router.push(`/admin/posts/edit/${id}`)
+  }
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Gerenciar Posts</h1>
 
       {/* Formulário para adicionar post */}
-      <div className="mb-6">
+      <div className="mb-6 gap-y-5">
         <input
           type="text"
           placeholder="Título do post"
@@ -100,7 +109,11 @@ const PostsAdmin = () => {
           onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
           className="border p-2 rounded-md mr-2 w-full mb-2 text-black"
         />
+        <div className='bottom-5'>
+          <RichTextEditor value={newPost.content} onChange={(valor) => setNewPost({ ...newPost, content: valor })}/>
+        </div>
         <textarea
+          hidden={true}
           placeholder="Conteúdo do post"
           value={newPost.content}
           onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
@@ -119,6 +132,7 @@ const PostsAdmin = () => {
             </option>
           ))}
         </select>
+
         <button
           onClick={handleAddPost}
           className="bg-blue-500 text-white px-4 py-2 rounded-md"
@@ -137,18 +151,27 @@ const PostsAdmin = () => {
           >
             <div>
               <h2 className="text-lg font-bold">{post.title}</h2>
-              <p>{post.content}</p>
-              <small>
-                Categoria: {categories.find((cat) => cat.id === post.id)?.descricao || 'N/A'}
-              </small>
+              <p dangerouslySetInnerHTML={{__html: post.content || ''}} />
+              <strong>
+                Categoria: {categories.find((cat) => cat.id === post.categoriaId)?.descricao || 'N/A'}
+              </strong>
             </div>
-            <button
-              onClick={() => handleDeletePost(post.id)}
-              className="bg-red-500 text-white px-4 py-2 rounded-md"
-              disabled={loading}
-            >
-              {loading ? 'Excluindo...' : 'Excluir'}
-            </button>
+            <div className='flex gap-4'>
+              <button
+                onClick={() => handlerUpdatePost(post.id || '')}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                disabled={loading}
+              >
+                {loading ? 'Editando...' : 'Editar'}
+              </button>
+              <button
+                onClick={() => handleDeletePost(post.id || '')}
+                className="bg-red-500 text-white px-4 py-2 rounded-md"
+                disabled={loading}
+              >
+                {loading ? 'Excluindo...' : 'Excluir'}
+              </button>
+            </div>
           </li>
         ))}
       </ul>

@@ -5,19 +5,23 @@ export interface IUnidadeDeNegocio {
 }
 
 export interface ICategoria {
-    id: string;
+    id?: string;
     descricao?: string;
     undadeDeNegocio?: IUnidadeDeNegocio;
     home?: boolean;
     publicar?: boolean;
     slug?: string;
+    layout?: string;
 }
 
 export interface IPost{
-    id: string;
-    title: string;  
-    content: string;
-    createdAt: Date;
+    id?: string;
+    title?: string;  
+    content?: string;
+    createdAt?: Date;
     updatedAt?: Date;
-    categoriaId: ICategoria['id'];
+    categoriaId?: ICategoria['id'];
+    imageUrl?: string;
+    tipo?: 'page'|'post'|'produto';
+    link?: string;
 }
