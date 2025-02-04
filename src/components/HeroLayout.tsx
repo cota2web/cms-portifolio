@@ -30,7 +30,8 @@ const HeroLayout: React.FC<{posts: IPost[]}> = ({posts}) => {
                   </p>
                   <button 
                   onClick={()=>{
-                    router.push(`${configApp.app.urlBase}:${configApp.app.port}${post.link}`)
+                    if(post.link)
+                      router.push(`${configApp.app.urlBase}:${configApp.app.port}${post.link}`)
                   }}
                   className="bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
                       Saiba Mais
